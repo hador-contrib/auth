@@ -30,7 +30,7 @@ func Basic(username, password string) Func {
 	return func(req *http.Request) error {
 		auth := req.Header.Get("Authorization")
 		if auth != "Basic "+siteAuth {
-			return fmt.Errorf("Basic Not Authorized")
+			return fmt.Errorf(`Basic realm="Not Authorized"`)
 		}
 		return nil
 	}

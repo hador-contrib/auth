@@ -38,6 +38,7 @@ func Filter(f Func) hador.FilterFunc {
 	return func(ctx *hador.Context, next hador.Handler) {
 		err := f.Auth(ctx.Request)
 		if err != nil {
+			ctx.Response.Header().Set("WWW-Authenticate", err.Error())
 			ctx.OnError(http.StatusUnauthorized, err)
 			return
 		}
