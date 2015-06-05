@@ -19,7 +19,6 @@ package auth
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -39,17 +38,7 @@ func TestAuth(t *testing.T) {
 
 		h := hador.New()
 		h.AddFilters(
-			hador.FilterFunc(func(ctx *hador.Context, next hador.Handler) {
-				ctx.SetErrorHandler(http.StatusUnauthorized, func(args ...interface{}) {
-					text := http.StatusText(http.StatusUnauthorized)
-					if len(args) > 0 {
-						text = fmt.Sprintf("%v", args[0])
-					}
-					http.Error(ctx.Response, text, http.StatusUnauthorized)
-				})
-				next.Serve(ctx)
-			}),
-			Filter(f),
+			Filter(AuthFunc(f)),
 		)
 
 		h.Get("/test", hador.HandlerFunc(func(ctx *hador.Context) {
@@ -63,7 +52,7 @@ func TestAuth(t *testing.T) {
 			h.ServeHTTP(resp, req)
 
 			convey.So(resp.Code, convey.ShouldEqual, http.StatusUnauthorized)
-			convey.So(resp.Body.String(), convey.ShouldEqual, "Not Authorized\n")
+			convey.So(resp.Header().Get("WWW-Authenticate"), convey.ShouldNotBeBlank)
 		})
 
 		convey.Convey("Authorization", func() {

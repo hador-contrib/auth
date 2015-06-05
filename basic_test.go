@@ -27,12 +27,17 @@ import (
 	"github.com/smartystreets/goconvey/convey"
 )
 
+var (
+	username = "foo"
+	password = "bar"
+)
+
 func TestBasic(t *testing.T) {
 	convey.Convey("Test Auth", t, func() {
 
 		h := hador.New()
 		h.AddFilters(
-			Filter(Basic("foo", "bar")),
+			Filter(Basic(username, password)),
 		)
 
 		h.Get("/test", hador.HandlerFunc(func(ctx *hador.Context) {
@@ -50,7 +55,7 @@ func TestBasic(t *testing.T) {
 
 		convey.Convey("Authorization", func() {
 			req, _ := http.NewRequest("GET", "/test", nil)
-			auth := "Basic " + base64.StdEncoding.EncodeToString([]byte("foo:bar"))
+			auth := "Basic " + base64.StdEncoding.EncodeToString([]byte(username+":"+password))
 			req.Header.Set("Authorization", auth)
 			resp := httptest.NewRecorder()
 

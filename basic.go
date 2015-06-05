@@ -24,7 +24,7 @@ import (
 )
 
 // Basic provides basic auth check
-func Basic(username, password string) Func {
+func Basic(username, password string) AuthFunc {
 	var siteAuth = base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
 
 	return func(req *http.Request) error {

@@ -23,20 +23,23 @@ import (
 	"github.com/Xuyuanp/hador"
 )
 
-// ErrorKey is the key of unauthorized error in context
-const ErrorKey = "github.com/hador-contrib/auth.Error"
+// Authenticator interface.
+type Authenticator interface {
+	Auth(*http.Request) error
+}
 
-// Func is a function to check authorized
-type Func func(*http.Request) error
+// AuthFunc is a function to check authorized.
+type AuthFunc func(*http.Request) error
 
-func (f Func) Auth(req *http.Request) error {
+// Auth implements Authenticator interface by calls function f.
+func (f AuthFunc) Auth(req *http.Request) error {
 	return f(req)
 }
 
-// Filter filters request by AuthFunc
-func Filter(f Func) hador.FilterFunc {
+// Filter filters request by Authenticator.
+func Filter(a Authenticator) hador.FilterFunc {
 	return func(ctx *hador.Context, next hador.Handler) {
-		err := f.Auth(ctx.Request)
+		err := a.Auth(ctx.Request)
 		if err != nil {
 			ctx.Response.Header().Set("WWW-Authenticate", err.Error())
 			ctx.OnError(http.StatusUnauthorized, err)
