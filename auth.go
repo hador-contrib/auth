@@ -37,7 +37,15 @@ func (f AuthFunc) Auth(req *http.Request) error {
 }
 
 // Filter filters request by Authenticator.
-func Filter(a Authenticator) hador.FilterFunc {
+func Filter(a Authenticator) hador.Filter {
+	return filter(a)
+}
+
+func FilterFunc(f func(*http.Request) error) hador.Filter {
+	return Filter(AuthFunc(f))
+}
+
+func filter(a Authenticator) hador.FilterFunc {
 	return func(ctx *hador.Context, next hador.Handler) {
 		err := a.Auth(ctx.Request)
 		if err != nil {

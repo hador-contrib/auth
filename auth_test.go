@@ -38,7 +38,7 @@ func TestAuth(t *testing.T) {
 
 		h := hador.New()
 		h.AddFilters(
-			Filter(AuthFunc(f)),
+			FilterFunc(f),
 		)
 
 		h.Get("/test", hador.HandlerFunc(func(ctx *hador.Context) {
